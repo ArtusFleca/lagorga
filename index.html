@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth bg-[#0a0a0a]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Gorga - Crónica de un Forastero</title>
+  <!-- Tailwind CSS para la maquetación responsiva y estética -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Librería html2canvas para la conversión de DOM a imagen PNG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- Google Fonts para tipografías atmosféricas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #d4d4d8;
+      background-image: radial-gradient(circle at 50% 0%, #1a1a0f 0%, transparent 70%);
+    }
+    .serif-accent { font-family: 'Playfair Display', serif; }
+    .typewriter { font-family: 'Courier Prime', monospace; }
+    .elite-accent { font-family: 'Special Elite', monospace; }
+    
+    .glow-yellow { text-shadow: 0 0 12px rgba(202, 138, 4, 0.5); }
+    
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #713f12; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #ca8a04; }
+
+    textarea {
+      scrollbar-width: thin;
+      scrollbar-color: #713f12 #09090b;
+    }
+
+    .susurrar-btn:hover svg {
+      transform: scale(1.15);
+      color: #ca8a04;
+    }
+
+    /* Contenedor Oculto para la Exportación de la Imagen */
+    #export-card {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      width: 480px; 
+      background-color: #0d0d0c;
+      color: #e4e4e7;
+      border: 1px solid #3f3f46;
+      padding: 2.2rem;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
+      font-family: 'Courier Prime', monospace;
+      pointer-events: none !important;
+      user-select: none !important;
+      z-index: -9999 !important;
+      overflow: hidden;
+    }
+    .export-bg {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #0d0d0c;
+      background-image: radial-gradient(circle at 50% 0%, #171711 0%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .export-content { position: relative; z-index: 1; }
+
+    /* Estilos de Impresión Arreglados */
+    @media print {
+      body, html {
+        background: white !important;
+        color: black !important;
+        background-image: none !important;
+        display: block !important; 
+        min-height: auto !important;
+        height: auto !important;
+      }
+      main, section, div, aside {
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+      }
+      .flex-grow {
+        display: block !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      /* Limpiar estilos oscuros para impresión de la barra lateral y contenedor principal */
+      #questions-container, aside > div {
+        border: none !important;
+        background: transparent !important;
+        color: black !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        margin-bottom: 2rem !important;
+      }
+      aside h3 { color: black !important; border-bottom-color: black !important; }
+      textarea, input {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1px dotted #333 !important;
+        color: black !important;
+        resize: none !important;
+        overflow: hidden !important;
+      }
+      .tab-content.hidden {
+        display: none !important;
+      }
+      .tab-content:not(.hidden) {
+        display: block !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .susurrar-btn, .blur-2xl {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-yellow-700 selection:text-white">
+
+  <!-- Header -->
+  <header class="no-print border-b border-zinc-800 bg-[#050505] px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 z-20 relative">
+    <div class="flex items-center gap-4">
+      <div class="w-2.5 h-2.5 bg-yellow-600 rounded-full animate-pulse glow-yellow"></div>
+      <div>
+        <h1 class="elite-accent text-2xl text-yellow-600 tracking-widest">LA GORGA</h1>
+        <p class="text-[10px] text-zinc-500 typewriter tracking-widest uppercase">Crónica de un Forastero</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3 relative z-30">
+      <button onclick="window.print()" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 rounded text-xs typewriter transition duration-300 font-bold flex items-center gap-2 border border-zinc-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+        </svg>
+        IMPRIMIR PDF
+      </button>
+      
+      <button onclick="exportToCompactPNG()" class="px-5 py-2.5 bg-zinc-800 hover:bg-yellow-750 text-zinc-300 hover:text-white rounded text-xs typewriter transition duration-300 font-bold flex items-center gap-2 border border-zinc-700 hover:border-yellow-500 shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        GUARDAR PNG
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+    
+    <!-- Columna Izquierda: Pinceladas (Ya no tiene no-print, así que saldrá al imprimir) -->
+    <aside class="lg:col-span-4 space-y-6">
+      
+      <div class="bg-zinc-900/50 p-5 rounded-md border border-zinc-800/80 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-900/10 blur-2xl rounded-full pointer-events-none"></div>
+        <h3 class="typewriter text-[11px] text-yellow-600/80 uppercase tracking-widest mb-4 border-b border-zinc-800 pb-2">Pinceladas</h3>
+        
+        <div class="space-y-4 relative z-10">
+          <div>
+            <div class="flex justify-between items-end mb-1">
+              <label class="text-[10px] text-zinc-400 typewriter uppercase">Nombre de tu forastero</label>
+              <button onclick="fillRandom('meta-nombre')" class="susurrar-btn text-zinc-500 hover:text-yellow-500 flex items-center gap-1 text-[9px] typewriter transition-colors" title="Susurrar idea">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                SUSURRAR
+              </button>
+            </div>
+            <input type="text" id="meta-nombre" placeholder="Ej. Ernest Vidal..." class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 text-sm p-2.5 rounded-sm text-zinc-200 typewriter outline-none transition-colors">
+          </div>
+
+          <div>
+            <div class="flex justify-between items-end mb-1">
+              <label class="text-[10px] text-zinc-400 typewriter uppercase">Una postal para el grupo</label>
+              <button onclick="fillRandom('meta-lugar')" class="susurrar-btn text-zinc-500 hover:text-yellow-500 flex items-center gap-1 text-[9px] typewriter transition-colors" title="Susurrar idea">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                AZAR
+              </button>
+            </div>
+            <textarea id="meta-lugar" placeholder="Un lugar, un paisaje... para otros forasteros." class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 text-xs p-2.5 rounded-sm text-zinc-300 typewriter outline-none h-16 resize-none transition-colors"></textarea>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-end mb-1">
+              <label class="text-[10px] text-zinc-400 typewriter uppercase">Una imagen para el grupo</label>
+              <button onclick="fillRandom('meta-objeto')" class="susurrar-btn text-zinc-500 hover:text-yellow-500 flex items-center gap-1 text-[9px] typewriter transition-colors" title="Susurrar idea">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                AZAR
+              </button>
+            </div>
+            <textarea id="meta-objeto" placeholder="Un objeto, un habitante, una impronta... para otros forasteros." class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 text-xs p-2.5 rounded-sm text-zinc-300 typewriter outline-none h-16 resize-none transition-colors"></textarea>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Columna Derecha: Formulario del Dossier -->
+    <section class="lg:col-span-8 bg-[#080808] border border-zinc-800 rounded-md p-6 sm:p-8 relative shadow-2xl" id="questions-container">
+      
+      <!-- Cabecera de Sincronización -->
+      <div class="border-b-2 border-zinc-800 pb-5">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h2 class="elite-accent text-3xl md:text-4xl text-yellow-600 glow-yellow tracking-wider">FICHA DEL FORASTERO</h2>
+            <p class="text-xs text-zinc-500 typewriter uppercase mt-1">Crónica de la ciudad amarilla</p>
+          </div>
+          <div class="text-right typewriter text-[10px] text-yellow-700">
+            AYUNTAMIENTO DE LA GORGA // PUBLIC_DATA_SYS
+          </div>
+        </div>
+        
+        <!-- Nombre Espejo Simplificado -->
+        <div class="mt-5 text-xs typewriter inline-block w-full sm:w-auto">
+          <div class="bg-zinc-950/50 px-4 py-3 rounded border border-zinc-800/80">
+            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Sujeto Designado</span>
+            <span id="output-nombre" class="font-bold text-zinc-200 text-sm italic">Desconocido</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selector de Tipo de Semilla -->
+      <div class="no-print mt-6 mb-8 bg-zinc-950 p-4 rounded-md border border-zinc-800 shadow-md">
+        <h3 class="typewriter text-[11px] text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+          La Semilla <span class="text-[9px] text-zinc-600">(Elige tu origen)</span>
+        </h3>
+        <nav class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2" id="nav-tabs">
+          <button onclick="switchTab('llamada')" id="btn-llamada" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border bg-yellow-900/20 text-yellow-500 border-yellow-700/50">
+            I. LLAMADA
+          </button>
+          <button onclick="switchTab('huida')" id="btn-huida" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
+            II. HUIDA
+          </button>
+          <button onclick="switchTab('busqueda')" id="btn-busqueda" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
+            III. BÚSQUEDA
+          </button>
+          <button onclick="switchTab('despertar')" id="btn-despertar" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
+            IV. DESPERTAR
+          </button>
+          <button onclick="switchTab('regreso')" id="btn-regreso" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
+            V. REGRESO
+          </button>
+          <button onclick="switchTab('pertenencia')" id="btn-pertenencia" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
+            VI. PERTENENCIA
+          </button>
+        </nav>
+      </div>
+
+      <!-- I. LLAMADA -->
+      <div id="tab-llamada" class="tab-content space-y-7">
+        <div class="border-b border-zinc-800/80 pb-4">
+          <div class="flex items-end gap-3">
+            <h2 class="serif-accent text-3xl text-zinc-200 tracking-wider">Llamada</h2>
+          </div>
+          <p class="text-xs text-zinc-400 italic mt-2 elite-accent tracking-wide">
+            Alguien con quien habías perdido todo contacto te ha llamado desde La Gorga. Y tú estás respondiendo a la llamada.
+          </p>
+        </div>
+        <div class="space-y-6" id="fields-llamada"></div>
+      </div>
+
+      <!-- II. HUIDA -->
+      <div id="tab-huida" class="tab-content space-y-7 hidden">
+        <div class="border-b border-zinc-800/80 pb-4">
+          <h2 class="serif-accent text-3xl text-zinc-200 tracking-wider">Huida</h2>
+          <p class="text-xs text-zinc-400 italic mt-2 elite-accent tracking-wide">
+            Estás huyendo de algo o de alguien. Hubieras ido a cualquier parte, pero tus pasos te han llevado hasta La Gorga.
+          </p>
+        </div>
+        <div class="space-y-6" id="fields-huida"></div>
+      </div>
+
+      <!-- III. BÚSQUEDA -->
+      <div id="tab-busqueda" class="tab-content space-y-7 hidden">
+        <div class="border-b border-zinc-800/80 pb-4">
+          <h2 class="serif-accent text-3xl text-zinc-200 tracking-wider">Búsqueda</h2>
+          <p class="text-xs text-zinc-400 italic mt-2 elite-accent tracking-wide">
+            La vieja obsesión que ha marcado tu vida te ha llevado hasta La Gorga. Y sabes que aquí acabará tu búsqueda al fin.
+          </p>
+        </div>
+        <div class="space-y-6" id="fields-busqueda"></div>
+      </div>
+
+      <!-- IV. DESPERTAR -->
+      <div id="tab-despertar" class="tab-content space-y-7 hidden">
+        <div class="border-b border-zinc-800/80 pb-4">
+          <h2 class="serif-accent text-3xl text-zinc-200 tracking-wider">Despertar</h2>
+          <p class="text-xs text-zinc-400 italic mt-2 elite-accent tracking-wide">
+            De repente tomas conciencia y no sabes ni dónde estás ni cómo has llegado hasta aquí. Sabes quién eres, pero te cuesta recordar.
+          </p>
+        </div>
+        <div class="space-y-6" id="fields-despertar"></div>
+      </div>
+
+      <!-- V. REGRESO -->
+      <div id="tab-regreso" class="tab-content space-y-7 hidden">
+        <div class="border-b border-zinc-800/80 pb-4">
+          <h2 class="serif-accent text-3xl text-zinc-200 tracking-wider">Regreso</h2>
+          <p class="text-xs text-zinc-400 italic mt-2 elite-accent tracking-wide">
+            Naciste en La Gorga. Aunque la abandonaste hace tiempo, nunca ha dejado de formar parte de ti. Y ahora estás de regreso.
+          </p>
+        </div>
+        <div class="space-y-6" id="fields-regreso"></div>
+      </div>
+
+      <!-- VI. PERTENENCIA -->
+      <div id="tab-pertenencia" class="tab-content space-y-7 hidden">
+        <div class="border-b border-zinc-800/80 pb-4">
+          <h2 class="serif-accent text-3xl text-zinc-200 tracking-wider">Pertenencia</h2>
+          <p class="text-xs text-zinc-400 italic mt-2 elite-accent tracking-wide">
+            Vives en La Gorga. Desde siempre, su tristeza y su melancolía han sido tu hogar. Creías en un pacto, una tregua. Te equivocabas.
+          </p>
+        </div>
+        <div class="space-y-6" id="fields-pertenencia"></div>
+      </div>
+
+      <!-- Pie de página atmosférico -->
+      <div class="border-t border-zinc-800/60 mt-8 pt-6 flex justify-between items-center text-[10px] text-zinc-500 typewriter">
+        <span>LA GORGA</span>
+        <span class="text-yellow-700 tracking-wider">FORASTERO / HABITANTE / PRESA</span>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-6 right-6 bg-[#1a1a1a] border-l-2 border-yellow-600 text-zinc-300 px-4 py-3 shadow-2xl typewriter text-xs hidden transition-all z-50 flex items-center gap-3">
+    <span id="toast-text"></span>
+  </div>
+
+  <!-- Contenedor Oculto para Generar la Imagen Compacta -->
+  <div id="export-card">
+    <div class="export-bg"></div>
+    <div class="export-content">
+      <div class="border-b border-zinc-700 pb-3 mb-4">
+        <div class="flex justify-between items-end">
+          <h2 class="serif-accent text-xl text-yellow-600 tracking-widest uppercase">Crónica de un Forastero</h2>
+          <div class="text-[8px] text-zinc-500 typewriter">LA GORGA // ARCHIVO</div>
+        </div>
+        <div class="text-[9px] text-zinc-400 typewriter mt-1 uppercase" id="export-origen">Origen: Desconocido</div>
+      </div>
+      
+      <!-- Metadatos Compactos (Ahora con Postal e Imagen incluidas) -->
+      <div class="space-y-3 mb-5 bg-[#111111] p-3.5 border border-zinc-800/80">
+        <div>
+          <span class="text-[8px] text-yellow-700/80 uppercase block tracking-wider mb-0.5">Sujeto</span>
+          <span id="export-nombre" class="text-xs font-bold text-zinc-200"></span>
+        </div>
+        <div class="mt-2 pt-2 border-t border-zinc-800/50">
+          <span class="text-[8px] text-yellow-700/80 uppercase block tracking-wider mb-0.5">Una postal para el grupo</span>
+          <span id="export-postal" class="text-[10px] text-zinc-300"></span>
+        </div>
+        <div class="mt-2 pt-2 border-t border-zinc-800/50">
+          <span class="text-[8px] text-yellow-700/80 uppercase block tracking-wider mb-0.5">Una imagen para el grupo</span>
+          <span id="export-imagen" class="text-[10px] text-zinc-300"></span>
+        </div>
+      </div>
+
+      <div id="export-qa-container" class="space-y-4"></div>
+      
+      <div class="mt-6 pt-3 border-t border-zinc-800 text-center text-[8px] text-zinc-500 leading-snug italic" id="export-frase-azar"></div>
+    </div>
+  </div>
+
+  <script>
+    const loreDB = {
+      "meta-nombre": [
+        "Ernest Vidal", "Julia Murillo", "Andreu Castell", "Alan Muñoz", "Ana Bañón", "Fosco", "Recio Fuente", "Gabriel",
+        "Sebastià Llopis", "Lídia", "Carles", "Dymitri", "Tiberi", "Àngela", "Eva Monsoriu", "Eustaqui"
+      ],
+      "meta-lugar": [
+        "El espejo agrietado de la cabina de un ascensor.",
+        "El escaparate de unos grandes almacenes con varios maniquíes: todos desnudos salvo uno.",
+        "El patio de un instituto vacío donde huele fuertemente a cloro.",
+        "Un lavabo público en el que no hay gota de agua.",
+        "El interior del maletero de un coche, en la planta -7 de un parking.",
+        "Una sala de cine con el cartel de un próximo estreno: «Jamás»",
+        "Una noria de feria infantil vacía.",
+        "La consulta abandonada de un dentista, con la silla apuntando al mar.",
+        "Una cabina telefónica de color verde oliva atascada de arena seca.",
+        "Un muelle de hormigón pintarrajeada con tizas de colores.",
+        "La última planta del centro comercial l'Escuma, y sus coloridos suelos de mármol.",
+        "El túnel de una carretera a medio construir.",
+        "La cocina del hotel Excelsior.",
+        "Una playa en la que se ha enterrado algo blando.",
+        "Un mirador turístico donde el catalejo de monedas apunta siempre a una ventana a oscuras.",
+      ],
+      "meta-objeto": [
+        "Un marcapasos.",
+        "Un teléfono móvil con la pantalla resquebrajada mostrando la foto de un pie.",
+        "Una cucharilla de plata con las iniciales A. P. doblada a la fuerza.",
+        "Un cepillo de pelo lleno de cabellos rojos.",
+        "Un álbum de fotos médicas de víctimas de accidentes de tráfico.",
+        "Un bote de cristal vacío que huele intensamente a amoníaco.",
+        "Una cinta de casete donde solo se oye una nana cantada por urracas.",
+        "Una cuchilla de afeitar envuelta cuidadosamente en papel de plata.",
+        "Un reloj de pulsera que marca siempre las tres y cuarto.",
+        "Una postal arrugada de los años setenta con la foto del hotel Excelsior.",
+        "Un llavero de latón doblada.",
+        "Un mechero de gasolina grabado con unas iniciales que pertenecen a un muerto reciente.",
+        "Un billete de tren de solo ida, con la fecha de hoy, pero impreso hace treinta años.",
+        "Una vieja cinta de Súper 8 guardada en una lata oxidada que huele a vinagre.",
+        "Una concha marina que no emite el sonido del mar. No omite ningún sonido.",
+      ],
+      "llamada_q1": ["Mi hermano gemelo...", "La antigua directora..."], 
+      "llamada_q2": ["Recibí una postal..."],
+      "llamada_q3": ["Veraneaba aquí..."],
+      "llamada_q4": ["Tengo que cerrar..."],
+      "huida_q1": ["De un crimen atroz..."],
+      "huida_q2": ["Ya me ha alcanzado..."],
+      "huida_q3": ["Vivo en las sombras..."],
+      "huida_q4": ["A mi hija pequeña..."],
+      "huida_q5": ["En un autobús que olía a rancio..."],
+      "huida_q6": ["Cuando baje en ese ascensor..."],
+      "busqueda_q1": ["Esclarecer un secreto médico..."],
+      "busqueda_q2": ["Encontré un recorte de periódico..."],
+      "busqueda_q3": ["Lo he perdido todo..."],
+      "despertar_q1": ["El ruido estridente del claxon..."],
+      "despertar_q2": ["He visto su nombre en los telediarios..."],
+      "despertar_q3": ["No puedo recordar el rostro de mi hijo..."],
+      "despertar_q4": ["El sonido de una urraca picoteando..."],
+      "regreso_q1": ["Tenía seis años..."],
+      "regreso_q2": ["He recibido en herencia la vieja casa..."],
+      "regreso_q3": ["Mi tía anciana..."],
+      "regreso_q4": ["El viejo cine donde me colaba de niño..."],
+      "regreso_q5": ["Mi lugar favorito es el rompeolas..."],
+      "regreso_q6": ["Una pequeña caja de latón enterrada..."],
+      "pertenencia_q1": ["Ambos parecemos amables por fuera..."],
+      "pertenencia_q2": ["Vendería a mi propio hijo..."],
+      "pertenencia_q3": ["Me ha robado la ambición..."],
+      "pertenencia_q4": ["Sé que la pintura blanca del 74..."]
+    };
+
+    const questionsStructure = {
+      llamada: [
+        { id: "llamada_q1", label: "✦ ¿De quién se trata? ¿Familiar, amigo o amiga, amante…?" },
+        { id: "llamada_q2", label: "✦ ¿Se ha puesto en contacto contigo? ¿O simplemente has recibido noticias suyas? ¿Cuáles?" },
+        { id: "llamada_q3", label: "✦ ¿Habías estado antes en La Gorga? ¿Conocías la ciudad? ¿Hay ahí algún lugar especial para ti?" },
+        { id: "llamada_q4", label: "✦ ¿Cómo te justificas estar acudiendo a esa llamada? ¿Sabes acaso lo que esperas conseguir?" }
+      ],
+      huida: [
+        { id: "huida_q1", label: "✦ ¿De qué (o de quién) huyes?" },
+        { id: "huida_q2", label: "✦ ¿Aún temes que te alcance?" },
+        { id: "huida_q3", label: "✦ ¿Te escondes todavía, o has dejado de esconderte?" },
+        { id: "huida_q4", label: "✦ ¿Qué (o a quién) tuviste que dejar atrás en tu huida?" },
+        { id: "huida_q5", label: "✦ ¿Cómo llegaste hasta La Gorga? ¿Cuál fue el primer lugar al que llegaste, y qué impresión te causó?" },
+        { id: "huida_q6", label: "✦ ¿Cuándo terminará tu huida?" }
+      ],
+      busqueda: [
+        { id: "busqueda_q1", label: "✦ ¿Qué buscas? ¿La Verdad, esclarecer un misterio oculto a la Humanidad o dar con algo/alguien que te obsesiona?" },
+        { id: "busqueda_q2", label: "✦ ¿Por qué sientes que aquí, en La Gorga darás al fin con ello? ¿Qué pistas te han traído? ¿Por dónde empezarás?" },
+        { id: "busqueda_q3", label: "✦ ¿Cuánto has perdido y cuánto sacrificado por culpa de tu obsesión?" }
+      ],
+      despertar: [
+        { id: "despertar_q1", label: "✦ ¿Cuál es el último recuerdo, la última imagen, cuando tratas de recordar cómo has llegado aquí?" },
+        { id: "despertar_q2", label: "✦ ¿Conocías La Gorga? ¿Tiene algún significado para ti?" },
+        { id: "despertar_q3", label: "✦ ¿Hay algo concreto que no consigas recordar que te angustie especialmente?" },
+        { id: "despertar_q4", label: "✦ ¿Hay algún recuerdo de tu vida, en cambio, que te venga ahora a la cabeza una y otra vez?" }
+      ],
+      regreso: [
+        { id: "regreso_q1", label: "✦ ¿Cuántos años tenías cuando dejaste la ciudad?" },
+        { id: "regreso_q2", label: "✦ ¿Por qué regresas ahora?" },
+        { id: "regreso_q3", label: "✦ ¿Había algo o alguien en La Gorga esperando tu regreso?" },
+        { id: "regreso_q4", label: "✦ ¿Qué es lo que no ha sobrevivido al paso de todos estos años fuera?" },
+        { id: "regreso_q5", label: "✦ ¿Cuál es tu sitio favorito de la ciudad? ¿Y cuál te da miedo?" },
+        { id: "regreso_q6", label: "✦ ¿Qué hay en La Gorga que te pertenece?" }
+      ],
+      pertenencia: [
+        { id: "pertenencia_q1", label: "✦ ¿En qué te pareces a La Gorga?" },
+        { id: "pertenencia_q2", label: "✦ ¿Qué serías capaz de hacer para huir de La Gorga? ¿Y para protegerla? ¿Cuán lejos llegarías?" },
+        { id: "pertenencia_q3", label: "✦ ¿Cómo ha arruinado tu vida vivir en La Gorga? ¿Y cómo la ha iluminado? ¿Qué gozo inalcanzable has aprendido?" },
+        { id: "pertenencia_q4", label: "✦ ¿Qué secreto CONOCES de La Gorga que ha condicionado tu vida?" }
+      ]
+    };
+
+    const frasesAforismos = [
+      "Nadie escapa a su propio esófago.",
+      "La ciudad amarilla lo cura todo.",
+      "El mar que baña La Gorga es un mar sin fondo, con memoria.",
+      "Tarde o temprano, la pintura blanca siempre amarillea.",
+      "¿Qué te diferencia de ese maniquí?",
+      "El agua de la piscina bajo tierra sabe a amoníaco y despedida.",
+      "El faro no avisa a los barcos; los arrastra hacia sus dientes de piedra.",
+      "Los recuerdos enterrados bajo el pino enfermo laten todavía.",
+      "Uno no puede conciliar el sueño, porque no le pertenece.",
+      "Te esperan en el Excelsior: todos ellos.",
+      "No mires el retrovisor; tu reflejo ya no es tuyo.",
+      "La niebla de la Costa Brava huele a salitre y a la autopsia de un recuerdo."
+    ];
+
+    let activeTabId = 'llamada'; 
+
+    function renderFields() {
+      Object.keys(questionsStructure).forEach(tab => {
+        const container = document.getElementById(`fields-${tab}`);
+        if (!container) return;
+        let html = '';
+        questionsStructure[tab].forEach(q => {
+          html += `
+            <div class="space-y-2">
+              <div class="flex justify-between items-end mb-1">
+                <label class="block text-[11px] text-zinc-400 typewriter uppercase leading-tight pr-4">${q.label}</label>
+                <button onclick="fillRandom('${q.id}')" class="susurrar-btn text-zinc-500 hover:text-yellow-500 flex items-center gap-1 text-[9px] typewriter transition-colors shrink-0" title="Susurrar idea">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  AZAR
+                </button>
+              </div>
+              <textarea id="${q.id}" class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 rounded-sm p-3 text-sm text-zinc-300 outline-none typewriter min-h-[70px] resize-y transition-colors placeholder-zinc-700" placeholder="..."></textarea>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      });
+    }
+
+    function switchTab(tabId) {
+      activeTabId = tabId;
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      
+      const tabContent = document.getElementById('tab-' + tabId);
+      if (tabContent) {
+        tabContent.classList.remove('hidden');
+      }
+
+      document.querySelectorAll('#nav-tabs button').forEach(b => {
+        b.classList.remove('bg-yellow-900/20', 'text-yellow-500', 'border-yellow-700/50');
+        b.classList.add('border-zinc-800', 'bg-[#0a0a0a]', 'text-zinc-400');
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-zinc-800', 'bg-[#0a0a0a]', 'text-zinc-400');
+        activeBtn.classList.add('bg-yellow-900/20', 'text-yellow-500', 'border-yellow-700/50');
+      }
+    }
+
+    function fillRandom(fieldId) {
+      const options = loreDB[fieldId];
+      if (!options || options.length === 0) return;
+      const element = document.getElementById(fieldId);
+      if (!element) return;
+      
+      const randomText = options[Math.floor(Math.random() * options.length)];
+      element.value = randomText;
+      
+      if (fieldId === 'meta-nombre') {
+        const out = document.getElementById('output-nombre');
+        if (out) out.textContent = randomText;
+      }
+      
+      element.style.borderColor = '#ca8a04';
+      element.style.backgroundColor = '#1a1a0f';
+      setTimeout(() => {
+        element.style.borderColor = '';
+        element.style.backgroundColor = '';
+      }, 300);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      if (toast) {
+        const textSpan = document.getElementById('toast-text');
+        if (textSpan) textSpan.textContent = msg;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+      }
+    }
+
+    const metaNombre = document.getElementById('meta-nombre');
+    const outputNombre = document.getElementById('output-nombre');
+
+    if (metaNombre) {
+      metaNombre.addEventListener('input', (e) => {
+        if (outputNombre) {
+          outputNombre.textContent = e.target.value.trim() || "Desconocido";
+        }
+      });
+    }
+
+    function exportToCompactPNG() {
+      showToast("Revelando el expediente...");
+      
+      // Recoger los datos básicos y los nuevos campos (Postal e Imagen)
+      const elNombre = metaNombre ? (metaNombre.value.trim() || 'Desconocido') : 'Desconocido';
+      const elLugar = document.getElementById('meta-lugar') ? document.getElementById('meta-lugar').value.trim() : '';
+      const elObjeto = document.getElementById('meta-objeto') ? document.getElementById('meta-objeto').value.trim() : '';
+      
+      const expNombre = document.getElementById('export-nombre');
+      const expOrigen = document.getElementById('export-origen');
+      const expFrase = document.getElementById('export-frase-azar');
+      const expPostal = document.getElementById('export-postal');
+      const expImagen = document.getElementById('export-imagen');
+
+      if (expNombre) expNombre.textContent = elNombre;
+      if (expOrigen) expOrigen.textContent = "Origen: " + activeTabId.toUpperCase();
+      if (expPostal) expPostal.textContent = elLugar || 'Ninguna postal declarada.';
+      if (expImagen) expImagen.textContent = elObjeto || 'Ninguna imagen declarada.';
+
+      const fraseAzar = frasesAforismos[Math.floor(Math.random() * frasesAforismos.length)];
+      if (expFrase) expFrase.textContent = `"${fraseAzar}"`;
+
+      const qaContainer = document.getElementById('export-qa-container');
+      if (qaContainer) {
+        qaContainer.innerHTML = '';
+        questionsStructure[activeTabId].forEach(q => {
+          const ansEl = document.getElementById(q.id);
+          const answer = ansEl ? ansEl.value.trim() : '';
+          if (answer) {
+            qaContainer.innerHTML += `
+              <div class="mb-3 text-left">
+                <span class="block text-[8px] text-zinc-500 uppercase typewriter mb-0.5 leading-snug">${q.label}</span>
+                <p class="text-xs text-zinc-200 serif-accent leading-snug pl-2 border-l border-zinc-700">${answer}</p>
+              </div>
+            `;
+          }
+        });
+
+        if (qaContainer.innerHTML === '') {
+           qaContainer.innerHTML = `<p class="text-xs text-zinc-650 italic" style="color: #52525b;">Expediente vacío. El sujeto no ha declarado sobre su origen.</p>`;
+        }
+      }
+
+      const card = document.getElementById('export-card');
+      if (!card) {
+        showToast("Error: No se encontró la plantilla de exportación.");
+        return;
+      }
+      
+      if (typeof html2canvas === 'undefined') {
+        showToast("Error: La librería de imagen no cargó. Comprueba tu conexión.", "❌");
+        return;
+      }
+
+      try {
+        html2canvas(card, {
+          backgroundColor: '#0d0d0c',
+          scale: 2,
+          useCORS: true,
+          logging: false
+        }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `La_Gorga_Cronica_${elNombre.replace(/\s+/g, '_')}_${activeTabId}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast("Crónica guardada como imagen.");
+        }).catch(err => {
+          console.error(err);
+          showToast("Error al procesar el lienzo de imagen.", "❌");
+        });
+      } catch (e) {
+        console.error(e);
+        showToast("Error inesperado al exportar.", "❌");
+      }
+    }
+
+    renderFields();
+  </script>
+</body>
+</html>
