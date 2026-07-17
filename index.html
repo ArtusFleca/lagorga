@@ -13,6 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Special+Elite&display=swap" rel="stylesheet">
   <style>
+    html {
+      font-size: 18px;
+    }
     body {
       background-color: #0a0a0a;
       color: #d4d4d8;
@@ -39,12 +42,15 @@
       color: #ca8a04;
     }
 
-    /* Contenedor Oculto para la Exportación de la Imagen */
+    /* Contenedor Oculto para la Exportación de la Imagen (Formato Vertical Estilo Dossier).
+      Se aplican pointer-events: none y z-index negativo estricto para evitar que este bloque
+      flotante interfiera con los clics reales de la interfaz del usuario.
+    */
     #export-card {
       position: absolute;
       left: -9999px;
-      top: 0;
-      width: 480px; 
+      top: -9999px;
+      width: 480px; /* Ancho compacto de tarjeta vertical */
       background-color: #0d0d0c;
       color: #e4e4e7;
       border: 1px solid #3f3f46;
@@ -59,61 +65,52 @@
     .export-bg {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: #0d0d0c;
-      background-image: radial-gradient(circle at 50% 0%, #171711 0%, transparent 80%);
+      background-image: url('data:image/svg+xml;utf8,<svg opacity="0.03" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23noise)"/></svg>');
       pointer-events: none;
       z-index: 0;
     }
     .export-content { position: relative; z-index: 1; }
 
-    /* Estilos de Impresión Arreglados */
+    /* Estilos de Impresión */
     @media print {
-      body, html {
+      body {
         background: white !important;
         color: black !important;
         background-image: none !important;
-        display: block !important; 
-        min-height: auto !important;
-        height: auto !important;
-      }
-      main, section, div, aside {
-        height: auto !important;
-        min-height: auto !important;
-        overflow: visible !important;
-      }
-      .flex-grow {
-        display: block !important;
       }
       .no-print {
         display: none !important;
       }
-      /* Limpiar estilos oscuros para impresión de la barra lateral y contenedor principal */
-      #questions-container, aside > div {
+      #questions-container {
         border: none !important;
         background: transparent !important;
         color: black !important;
         padding: 0 !important;
-        box-shadow: none !important;
-        margin-bottom: 2rem !important;
       }
-      aside h3 { color: black !important; border-bottom-color: black !important; }
-      textarea, input {
+      textarea {
         background: transparent !important;
         border: none !important;
         border-bottom: 1px dotted #333 !important;
         color: black !important;
         resize: none !important;
-        overflow: hidden !important;
       }
+      input {
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 1px dotted #333 !important;
+        color: black !important;
+      }
+      /* Ocultar estrictamente las pestañas inactivas en la impresión */
       .tab-content.hidden {
         display: none !important;
       }
+      /* Forzar que solo la pestaña activa se imprima de manera limpia */
       .tab-content:not(.hidden) {
         display: block !important;
         page-break-after: avoid !important;
         page-break-inside: avoid !important;
       }
-      .susurrar-btn, .blur-2xl {
+      .susurrar-btn {
         display: none !important;
       }
     }
@@ -121,7 +118,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-yellow-700 selection:text-white">
 
-  <!-- Header -->
+  <!-- Header (Cabecera Principal de Control) -->
   <header class="no-print border-b border-zinc-800 bg-[#050505] px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 z-20 relative">
     <div class="flex items-center gap-4">
       <div class="w-2.5 h-2.5 bg-yellow-600 rounded-full animate-pulse glow-yellow"></div>
@@ -132,6 +129,7 @@
     </div>
     
     <div class="flex items-center gap-3 relative z-30">
+      <!-- Imprimir PDF -->
       <button onclick="window.print()" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 rounded text-xs typewriter transition duration-300 font-bold flex items-center gap-2 border border-zinc-800">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -139,6 +137,7 @@
         IMPRIMIR PDF
       </button>
       
+      <!-- Exportar Imagen -->
       <button onclick="exportToCompactPNG()" class="px-5 py-2.5 bg-zinc-800 hover:bg-yellow-750 text-zinc-300 hover:text-white rounded text-xs typewriter transition duration-300 font-bold flex items-center gap-2 border border-zinc-700 hover:border-yellow-500 shadow-lg">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -148,16 +147,19 @@
     </div>
   </header>
 
+  <!-- Contenedor Principal de la Interfaz -->
   <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
     
-    <!-- Columna Izquierda: Pinceladas (Ya no tiene no-print, así que saldrá al imprimir) -->
-    <aside class="lg:col-span-4 space-y-6">
+    <!-- Columna Izquierda: Metadatos y Navegación de Orígenes -->
+    <aside class="no-print lg:col-span-4 space-y-6">
       
+      <!-- Bloque de Edición del Personaje -->
       <div class="bg-zinc-900/50 p-5 rounded-md border border-zinc-800/80 shadow-xl relative overflow-hidden">
         <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-900/10 blur-2xl rounded-full pointer-events-none"></div>
         <h3 class="typewriter text-[11px] text-yellow-600/80 uppercase tracking-widest mb-4 border-b border-zinc-800 pb-2">Pinceladas</h3>
         
         <div class="space-y-4 relative z-10">
+          <!-- Campo Nombre -->
           <div>
             <div class="flex justify-between items-end mb-1">
               <label class="text-[10px] text-zinc-400 typewriter uppercase">Nombre de tu forastero</label>
@@ -169,36 +171,39 @@
             <input type="text" id="meta-nombre" placeholder="Ej. Ernest Vidal..." class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 text-sm p-2.5 rounded-sm text-zinc-200 typewriter outline-none transition-colors">
           </div>
 
+          <!-- Campo Postal -->
           <div>
             <div class="flex justify-between items-end mb-1">
               <label class="text-[10px] text-zinc-400 typewriter uppercase">Una postal para el grupo</label>
               <button onclick="fillRandom('meta-lugar')" class="susurrar-btn text-zinc-500 hover:text-yellow-500 flex items-center gap-1 text-[9px] typewriter transition-colors" title="Susurrar idea">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                AZAR
+                SUSURRAR
               </button>
             </div>
             <textarea id="meta-lugar" placeholder="Un lugar, un paisaje... para otros forasteros." class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 text-xs p-2.5 rounded-sm text-zinc-300 typewriter outline-none h-16 resize-none transition-colors"></textarea>
           </div>
 
+          <!-- Campo Imagen -->
           <div>
             <div class="flex justify-between items-end mb-1">
               <label class="text-[10px] text-zinc-400 typewriter uppercase">Una imagen para el grupo</label>
               <button onclick="fillRandom('meta-objeto')" class="susurrar-btn text-zinc-500 hover:text-yellow-500 flex items-center gap-1 text-[9px] typewriter transition-colors" title="Susurrar idea">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                AZAR
+                SUSURRAR
               </button>
             </div>
             <textarea id="meta-objeto" placeholder="Un objeto, un habitante, una impronta... para otros forasteros." class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 text-xs p-2.5 rounded-sm text-zinc-300 typewriter outline-none h-16 resize-none transition-colors"></textarea>
           </div>
         </div>
       </div>
+
     </aside>
 
-    <!-- Columna Derecha: Formulario del Dossier -->
+    <!-- Columna Derecha: Formulario del Dossier de Preguntas -->
     <section class="lg:col-span-8 bg-[#080808] border border-zinc-800 rounded-md p-6 sm:p-8 relative shadow-2xl" id="questions-container">
       
-      <!-- Cabecera de Sincronización -->
-      <div class="border-b-2 border-zinc-800 pb-5">
+      <!-- Cabecera de Sincronización en Tiempo Real -->
+      <div class="border-b-2 border-zinc-800 pb-6 mb-4">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h2 class="elite-accent text-3xl md:text-4xl text-yellow-600 glow-yellow tracking-wider">FICHA DEL FORASTERO</h2>
@@ -209,38 +214,44 @@
           </div>
         </div>
         
-        <!-- Nombre Espejo Simplificado -->
-        <div class="mt-5 text-xs typewriter inline-block w-full sm:w-auto">
-          <div class="bg-zinc-950/50 px-4 py-3 rounded border border-zinc-800/80">
-            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Sujeto Designado</span>
-            <span id="output-nombre" class="font-bold text-zinc-200 text-sm italic">Desconocido</span>
+        <!-- Bloque de Metadatos Espejo (Postal e Imagen solo se muestran al imprimir, ya que en pantalla viven en Pinceladas) -->
+        <div class="grid grid-cols-1 print:grid-cols-3 gap-4 mt-6 pt-4 border-t border-zinc-800/60 text-xs typewriter">
+          <div class="bg-zinc-950/50 p-3 rounded border border-zinc-800/80">
+            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Sujeto</span>
+            <span id="output-nombre" class="font-bold text-zinc-300 italic">Desconocido</span>
+          </div>
+          <div class="hidden print:block bg-zinc-950/50 p-3 rounded border border-zinc-800/80">
+            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Una postal para el grupo</span>
+            <span id="output-lugar" class="font-bold text-zinc-300 italic">Ninguna</span>
+          </div>
+          <div class="hidden print:block bg-zinc-950/50 p-3 rounded border border-zinc-800/80">
+            <span class="block text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Una imagen para el grupo</span>
+            <span id="output-objeto" class="font-bold text-zinc-300 italic block truncate max-w-full">Sin declarar</span>
           </div>
         </div>
       </div>
 
-      <!-- Selector de Tipo de Semilla -->
-      <div class="no-print mt-6 mb-8 bg-zinc-950 p-4 rounded-md border border-zinc-800 shadow-md">
-        <h3 class="typewriter text-[11px] text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-          La Semilla <span class="text-[9px] text-zinc-600">(Elige tu origen)</span>
-        </h3>
-        <nav class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2" id="nav-tabs">
-          <button onclick="switchTab('llamada')" id="btn-llamada" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border bg-yellow-900/20 text-yellow-500 border-yellow-700/50">
-            I. LLAMADA
+      <!-- Selector de Tipo de Semilla (al principio de la ficha, debajo del nombre) -->
+      <div class="no-print border-b-2 border-zinc-800 pb-6 mb-6">
+        <h3 class="typewriter text-[11px] text-zinc-500 uppercase tracking-widest mb-3">La Semilla (Elige una)</h3>
+        <nav class="flex flex-wrap gap-2" id="nav-tabs">
+          <button onclick="switchTab('llamada')" id="btn-llamada" class="px-4 py-2 rounded-sm text-sm typewriter transition duration-200 border border-yellow-600 bg-yellow-900/10 text-yellow-500 flex items-center gap-2">
+            <span>I. LLAMADA</span><span class="text-[10px] opacity-50">✦</span>
           </button>
-          <button onclick="switchTab('huida')" id="btn-huida" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
-            II. HUIDA
+          <button onclick="switchTab('huida')" id="btn-huida" class="px-4 py-2 rounded-sm text-sm typewriter transition duration-200 border border-zinc-800 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 flex items-center gap-2">
+            <span>II. HUIDA</span><span class="text-[10px] opacity-50">✦</span>
           </button>
-          <button onclick="switchTab('busqueda')" id="btn-busqueda" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
-            III. BÚSQUEDA
+          <button onclick="switchTab('busqueda')" id="btn-busqueda" class="px-4 py-2 rounded-sm text-sm typewriter transition duration-200 border border-zinc-800 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 flex items-center gap-2">
+            <span>III. BÚSQUEDA</span><span class="text-[10px] opacity-50">✦</span>
           </button>
-          <button onclick="switchTab('despertar')" id="btn-despertar" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
-            IV. DESPERTAR
+          <button onclick="switchTab('despertar')" id="btn-despertar" class="px-4 py-2 rounded-sm text-sm typewriter transition duration-200 border border-zinc-800 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 flex items-center gap-2">
+            <span>IV. DESPERTAR</span><span class="text-[10px] opacity-50">✦</span>
           </button>
-          <button onclick="switchTab('regreso')" id="btn-regreso" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
-            V. REGRESO
+          <button onclick="switchTab('regreso')" id="btn-regreso" class="px-4 py-2 rounded-sm text-sm typewriter transition duration-200 border border-zinc-800 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 flex items-center gap-2">
+            <span>V. REGRESO</span><span class="text-[10px] opacity-50">✦</span>
           </button>
-          <button onclick="switchTab('pertenencia')" id="btn-pertenencia" class="w-full text-center px-2 py-2 rounded-sm text-[11px] typewriter transition duration-200 border border-zinc-800 bg-[#0a0a0a] text-zinc-400 hover:bg-zinc-800">
-            VI. PERTENENCIA
+          <button onclick="switchTab('pertenencia')" id="btn-pertenencia" class="px-4 py-2 rounded-sm text-sm typewriter transition duration-200 border border-zinc-800 text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 flex items-center gap-2">
+            <span>VI. PERTENENCIA</span><span class="text-[10px] opacity-50">✦</span>
           </button>
         </nav>
       </div>
@@ -314,21 +325,23 @@
       </div>
 
       <!-- Pie de página atmosférico -->
-      <div class="border-t border-zinc-800/60 mt-8 pt-6 flex justify-between items-center text-[10px] text-zinc-500 typewriter">
+      <div class="border-t border-zinc-800/60 pt-6 flex justify-between items-center text-[10px] text-zinc-500 typewriter">
         <span>LA GORGA</span>
         <span class="text-yellow-700 tracking-wider">FORASTERO / HABITANTE / PRESA</span>
       </div>
     </section>
   </main>
 
+  <!-- Sistema de Avisos Flotantes (Toasts) -->
   <div id="toast" class="fixed bottom-6 right-6 bg-[#1a1a1a] border-l-2 border-yellow-600 text-zinc-300 px-4 py-3 shadow-2xl typewriter text-xs hidden transition-all z-50 flex items-center gap-3">
     <span id="toast-text"></span>
   </div>
 
-  <!-- Contenedor Oculto para Generar la Imagen Compacta -->
+  <!-- Contenedor Oculto para Generar la Imagen Compacta (Formato Vertical) -->
   <div id="export-card">
     <div class="export-bg"></div>
     <div class="export-content">
+      <!-- Encabezado Ficha -->
       <div class="border-b border-zinc-700 pb-3 mb-4">
         <div class="flex justify-between items-end">
           <h2 class="serif-accent text-xl text-yellow-600 tracking-widest uppercase">Crónica de un Forastero</h2>
@@ -337,29 +350,40 @@
         <div class="text-[9px] text-zinc-400 typewriter mt-1 uppercase" id="export-origen">Origen: Desconocido</div>
       </div>
       
-      <!-- Metadatos Compactos (Ahora con Postal e Imagen incluidas) -->
+      <!-- Metadatos Compactos en Lista Vertical -->
       <div class="space-y-3 mb-5 bg-[#111111] p-3.5 border border-zinc-800/80">
         <div>
           <span class="text-[8px] text-yellow-700/80 uppercase block tracking-wider mb-0.5">Sujeto</span>
           <span id="export-nombre" class="text-xs font-bold text-zinc-200"></span>
         </div>
-        <div class="mt-2 pt-2 border-t border-zinc-800/50">
+        <div class="border-t border-zinc-800/60 pt-2">
           <span class="text-[8px] text-yellow-700/80 uppercase block tracking-wider mb-0.5">Una postal para el grupo</span>
-          <span id="export-postal" class="text-[10px] text-zinc-300"></span>
+          <span id="export-lugar" class="text-xs text-zinc-300 italic block leading-tight"></span>
         </div>
-        <div class="mt-2 pt-2 border-t border-zinc-800/50">
+        <div class="border-t border-zinc-800/60 pt-2">
           <span class="text-[8px] text-yellow-700/80 uppercase block tracking-wider mb-0.5">Una imagen para el grupo</span>
-          <span id="export-imagen" class="text-[10px] text-zinc-300"></span>
+          <span id="export-objeto" class="text-xs text-zinc-300 italic block leading-tight"></span>
         </div>
       </div>
 
-      <div id="export-qa-container" class="space-y-4"></div>
+      <!-- Preguntas Dinámicas -->
+      <div id="export-qa-container" class="space-y-4">
+        <!-- Se rellena por JavaScript -->
+      </div>
       
-      <div class="mt-6 pt-3 border-t border-zinc-800 text-center text-[8px] text-zinc-500 leading-snug italic" id="export-frase-azar"></div>
+      <!-- Pie de página Dinámico -->
+      <div class="mt-6 pt-3 border-t border-zinc-800 text-center text-[8px] text-zinc-500 leading-snug italic" id="export-frase-azar">
+        "Nadie escapa a su propio esófago."
+      </div>
     </div>
   </div>
 
+
+  <!-- Lógica y Base de Datos de Opciones Aleatorias -->
   <script>
+    // --------------------------------------------------------
+    // BASE DE DATOS DE "SUSURROS" (16 opciones por campo: 8 originales + 8 nuevas)
+    // --------------------------------------------------------
     const loreDB = {
       "meta-nombre": [
         "Ernest Vidal", "Julia Murillo", "Andreu Castell", "Alan Muñoz", "Ana Bañón", "Fosco", "Recio Fuente", "Gabriel",
@@ -381,6 +405,7 @@
         "La cocina del hotel Excelsior.",
         "Una playa en la que se ha enterrado algo blando.",
         "Un mirador turístico donde el catalejo de monedas apunta siempre a una ventana a oscuras.",
+        
       ],
       "meta-objeto": [
         "Un marcapasos.",
@@ -398,36 +423,509 @@
         "Un billete de tren de solo ida, con la fecha de hoy, pero impreso hace treinta años.",
         "Una vieja cinta de Súper 8 guardada en una lata oxidada que huele a vinagre.",
         "Una concha marina que no emite el sonido del mar. No omite ningún sonido.",
+        
       ],
-      "llamada_q1": ["Mi hermano gemelo...", "La antigua directora..."], 
-      "llamada_q2": ["Recibí una postal..."],
-      "llamada_q3": ["Veraneaba aquí..."],
-      "llamada_q4": ["Tengo que cerrar..."],
-      "huida_q1": ["De un crimen atroz..."],
-      "huida_q2": ["Ya me ha alcanzado..."],
-      "huida_q3": ["Vivo en las sombras..."],
-      "huida_q4": ["A mi hija pequeña..."],
-      "huida_q5": ["En un autobús que olía a rancio..."],
-      "huida_q6": ["Cuando baje en ese ascensor..."],
-      "busqueda_q1": ["Esclarecer un secreto médico..."],
-      "busqueda_q2": ["Encontré un recorte de periódico..."],
-      "busqueda_q3": ["Lo he perdido todo..."],
-      "despertar_q1": ["El ruido estridente del claxon..."],
-      "despertar_q2": ["He visto su nombre en los telediarios..."],
-      "despertar_q3": ["No puedo recordar el rostro de mi hijo..."],
-      "despertar_q4": ["El sonido de una urraca picoteando..."],
-      "regreso_q1": ["Tenía seis años..."],
-      "regreso_q2": ["He recibido en herencia la vieja casa..."],
-      "regreso_q3": ["Mi tía anciana..."],
-      "regreso_q4": ["El viejo cine donde me colaba de niño..."],
-      "regreso_q5": ["Mi lugar favorito es el rompeolas..."],
-      "regreso_q6": ["Una pequeña caja de latón enterrada..."],
-      "pertenencia_q1": ["Ambos parecemos amables por fuera..."],
-      "pertenencia_q2": ["Vendería a mi propio hijo..."],
-      "pertenencia_q3": ["Me ha robado la ambición..."],
-      "pertenencia_q4": ["Sé que la pintura blanca del 74..."]
+      
+      // I. LLAMADA
+      "llamada_q1": [
+        "Mi hermano gemelo, que murió en un accidente hace diez años.",
+        "La antigua directora de mi orfanato.",
+        "El único amante al que de verdad quise y que abandoné sin despedirme.",
+        "Alguien cuya voz sonaba exactamente igual a la mía, pero más cansada.",
+        "Un investigador privado que contraté hace una década y del que no supe más.",
+        "Mi madre, aunque los médicos dicen que lleva meses en coma.",
+        "Nadie se identificó, pero sabía cómo me llamaban en el patio del colegio.",
+        "Mi antigua compañera de trabajo, la que desapareció de la oficina.",
+        "Un exsocio comercial que juró no volver a pisar la costa brava.",
+        "Mi profesor de violín del instituto, que siempre olía a tabaco de pipa.",
+        "Una prima lejana que se encargó de cuidar a mis padres en su vejez.",
+        "El médico de cabecera de mi infancia, jubilado hace mucho tiempo.",
+        "Un viejo amigo con el que compartí un secreto inconfesable en la playa.",
+        "Mi primer amor de juventud, que desapareció de los telediarios locales.",
+        "Un casero de una pensión barata donde me alojé hace quince años.",
+        "Alguien que dice tener en su poder las llaves de mi antigua casa."
+      ],
+      "llamada_q2": [
+        "Recibí una postal de La Gorga sin matasellos, solo decía 'Ya es la hora'.",
+        "Dejó un mensaje en mi contestador donde solo se oía el mar y un llanto.",
+        "Me llamaron de madrugada; al descolgar, escuché mi propio nombre susurrado.",
+        "Me enviaron una caja de cartón con un mechón de pelo y un ticket de tren.",
+        "Llevo soñando con su voz tres noches seguidas, indicándome esta dirección.",
+        "Apareció un anuncio en el periódico local con una fecha y el faro del pueblo.",
+        "Alguien hackeó mi ordenador y puso una foto de las calles de La Gorga de fondo.",
+        "Un telegrama con una única palabra: 'Vuelve'.",
+        "Encontré un sobre bajo mi puerta que contenía una llave oxidada numerada.",
+        "Me despertó una llamada de teléfono fijo; al contestar, sonó una nana de caja de música.",
+        "Un mensaje breve en mi buzón de voz con el sonido de pasos arrastrándose sobre fango.",
+        "Recibí un paquete con un álbum de fotos médicas antiguas y mi nombre escrito a mano.",
+        "Apareció una esquela en el periódico con mi propio alias y la dirección del hotel Excelsior.",
+        "Alguien dejó en mi parabrisas una postal mojada del Hostal del Mar.",
+        "Me enviaron una cinta de Súper 8 donde se veía el faro de La Gorga de noche.",
+        "Un siseo a través del interfono de mi edificio que repetía constantemente 'Acuérdate'."
+      ],
+      "llamada_q3": [
+        "Veraneaba aquí de pequeño. Aún recuerdo el olor a crema solar pasada.",
+        "Nací en La Gorga, pero me esforcé mucho en borrarla de mi mente.",
+        "Vine una vez buscando a alguien. Desperté en mi cama al día siguiente sin recuerdos.",
+        "Jamás, pero al ver el cartel de la entrada supe cómo llegar al faro ciegamente.",
+        "Tuve un accidente de coche cerca de aquí. Perdí algo en la playa La Ferèstega.",
+        "Dicen que los de mi familia vinieron de aquí, de la calle Gillerías.",
+        "Solo en mis pesadillas más febriles, esas en las que llueve dentro de casa.",
+        "Vine de viaje de fin de curso. Uno de mis compañeros no volvió en el autobús.",
+        "Acompañé a mi padre a un entierro en el antiguo tanatorio cuando tenía diez años.",
+        "Mi abuela tenía una pequeña casa unifamiliar cerca del rompeolas.",
+        "Estuve una noche de tormenta en el hotel Excelsior antes de que lo cerraran.",
+        "Recuerdo haber visitado de niño el cementerio que hay al pie de la iglesia.",
+        "Vine con mi primer coche. Se averió justo en la entrada de la ciudad amarilla.",
+        "Mi familia tenía un negocio de salazones en la calle de la Fondanada.",
+        "Pasé unos días huyendo de los exámenes en un hostal húmedo y oscuro.",
+        "Recuerdo el olor a amoníaco de la escuela de música a la que iba de niño."
+      ],
+      "llamada_q4": [
+        "Tengo que cerrar esa maldita puerta de una vez por todas.",
+        "Si no acudo, sé que esta ansiedad acabará volviéndome loco.",
+        "Es solo curiosidad morbosa. O eso intento decirme a mí mismo.",
+        "Necesito recuperar lo que me quitaron antes de que sea demasiado tarde.",
+        "Alguien tiene que pagar por lo que pasó, y sé que empezó aquí.",
+        "Me prometieron una cura para mi enfermedad. O al menos un final sin dolor.",
+        "La verdad es que no controlo mis propios pasos. Sentía que el coche conducía solo.",
+        "No tengo a dónde huir, La Gorga es mi última parada.",
+        "Necesito comprobar si el recuerdo que tengo de mi infancia es real o un delirio.",
+        "Espero encontrar el perdón de alguien que ya no puede hablarme.",
+        "Quiero ver si la casa familiar sigue en pie o si ya la ha devorado la maleza.",
+        "Si no respondo a esta llamada, temo que los sueños nunca me dejen dormir.",
+        "Vengo a buscar las respuestas que mi madre se llevó a la tumba.",
+        "Me he cansado de fingir que todo va bien fuera de este pueblo.",
+        "Sé que aquí acabará mi viaje, y prefiero que sea bajo mis propios términos.",
+        "Busco una tregua con los fantasmas que me persiguen en la gran ciudad."
+      ],
+
+      // II. HUIDA
+      "huida_q1": [
+        "De un crimen atroz que cometí en un arranque de ira.",
+        "De los cobradores de una deuda que se paga con sangre.",
+        "De un marido controlador y de los moretones que escondo bajo la ropa.",
+        "De la policía, que acaba de encontrar el cadáver donde lo enterré.",
+        "De la vergüenza insoportable de haber arruinado a mi familia.",
+        "De una sombra con forma humana que veo cada vez que me miro al espejo.",
+        "De un diagnóstico médico que me da dos meses de vida.",
+        "De mis propios recuerdos tras despertar del coma.",
+        "De la mirada de decepción de mi hija pequeña cuando me marche.",
+        "De un secreto profesional que destruiría a toda la corporación.",
+        "De una llamada telefónica constante que no cesa en mi cabeza.",
+        "De una acusación falsa que me ha convertido en un prófugo silencioso.",
+        "De la culpa de haber sobrevivido a un accidente donde murieron todos.",
+        "De un acreedor silencioso que sabe dónde vivo a cada hora.",
+        "De la rutina asfixiante que me estaba convirtiendo en un robot.",
+        "De una extraña dolencia que me hace ver manchas amarillas en las paredes."
+      ],
+      "huida_q2": [
+        "Ya me ha alcanzado. Siento su aliento en la nuca cuando estoy a oscuras.",
+        "Cada noche oigo sus pasos en el pasillo del hotel.",
+        "Sé que tarde o temprano tendré que pagar. El cansancio me está rindiendo.",
+        "Corrí tan rápido que creo que los dejó atrás. O eso quiero creer.",
+        "El agua del mar lo borra todo, confío en eso.",
+        "Sí, porque la entidad que me persigue lleva mi misma cara.",
+        "A veces creo que es La Gorga quien me persigue, y yo he corrido hacia su boca.",
+        "Temo más lo que hay delante de mí que lo que dejó atrás.",
+        "Siento que cada farola del camino me vigila para delatarme.",
+        "Sé que su coche rojo sigue mi rastro por la autopista lluviosa.",
+        "El zumbido del tábano en mi oído me dice que no hay escondite posible.",
+        "No temo que me alcance, temo lo que haré cuando me encuentre cara a cara.",
+        "La niebla de la Costa Brava me ocultará de sus ojos de pez.",
+        "Siento su presencia cada vez que suena un teléfono en las cercanías.",
+        "El miedo se ha convertido en una costra que ya forma parte de mi piel.",
+        "Me persigue mi propia sombra, y de esa no se puede escapar corriendo."
+      ],
+      "huida_q3": [
+        "Vivo en las sombras, saltando de pensión de mala muerte en pensión.",
+        "Ya me he cansado de correr. Que sea lo que Dios quiera.",
+        "Cambié de nombre, de tinte de pelo, pero no de pecados.",
+        "Me escondo a plena luz del día, intentando ser un don nadie.",
+        "Solo me escondo de mí mismo en el fondo de las botellas.",
+        "La Gorga es el escondite perfecto, aquí a nadie le importa quién eres.",
+        "Mi disfraz es una vida miserable. Me humillo para que no sospechen de mí.",
+        "Ya no. He venido aquí a rendir cuentas de una vez por todas.",
+        "Me escondo detrás de unas gafas oscuras y una falsa amabilidad.",
+        "Duermo de día y deambulo de noche para no cruzarme con miradas.",
+        "He borrado todo rastro digital, no tengo nombre ni pasado útil.",
+        "Me oculto en las habitaciones más baratas del Hostal del Mar.",
+        "Finjo ser un simple turista despistado buscando la playa salvaje.",
+        "He aprendido a no mirar directamente a los ojos de la gente.",
+        "Uso una gabardina demasiado grande para ocultar mis temblores.",
+        "He dejado de esconderme; ahora solo espero que la marea me lleve."
+      ],
+      "huida_q4": [
+        "A mi hija pequeña. Aún oigo su llanto cuando cierro los ojos.",
+        "Mi carrera, mi dinero y toda mi reputación. Lo tiré todo por la borda.",
+        "A mi hermano, dejándolo cargar con una culpa que era mía.",
+        "El cadáver de alguien que no merecía terminar así.",
+        "Mi propia cordura en la bañera de aquel motel de carretera.",
+        "Un amor verdadero que me habría salvado la vida si hubiera sido valiente.",
+        "Mi rostro original. Los cirujanos hicieron lo que pudieron.",
+        "Un perro atado en el patio que no paraba de ladrar. Nadie le dará de comer.",
+        "Una pequeña librería antigua que heredé de mi abuelo paterno.",
+        "Las llaves de la única casa donde fui verdaderamente feliz.",
+        "Un álbum de fotos familiares que no me atreví a meter en la maleta.",
+        "La última voluntad de mi padre, escrita en una servilleta de bar.",
+        "Un puesto de trabajo seguro en el consistorio de mi suegro.",
+        "A mi compañero de piso, que ahora debe de estarse preguntando dónde estoy.",
+        "El viejo piano de pared de la sala de música escolar.",
+        "La infancia tranquila de la que fui despojado demasiado pronto."
+      ],
+      "huida_q5": [
+        "En un autobús que olía a rancio. Parecía un decorado de cartón piedra.",
+        "Conduciendo sin rumbo bajo la lluvia hasta quedarme sin gasolina.",
+        "En un tren nocturno. Al bajar, la estación estaba amarilla y desierta.",
+        "Desperté en la playa, desorientado, con sabor a sal y arena en la boca.",
+        "Llegué de noche; los maniquíes de los escaparates parecían seguirme con la mirada.",
+        "Caminando. El cartel de bienvenida del ayuntamiento me provocó náuseas.",
+        "En autoestop. El conductor no dijo una palabra y me dejó en la rotonda del faro.",
+        "Atravesando túneles oscuros, hasta que la niebla de la costa me engulló.",
+        "En un camión de reparto de pescado que olía fuertemente a salitre.",
+        "Caminando por las vías del ferrocarril bajo un sol que quemaba la nuca.",
+        "Desperté en un área de servicio abandonada en mitad de la autopista.",
+        "Llegué en bicicleta, con las manos sucias y las rodillas despellejadas.",
+        "Me dejó un pescador de paso en una rampa de piedra cerca de la playa.",
+        "En un taxi cuyo conductor hablaba solo y repetía mi propio nombre.",
+        "Llegué cruzando el Pinar bajo un frío seco que resquebrajaba los labios.",
+        "Apareció en el vestíbulo del hotel Excelsior con un maletín ajado."
+      ],
+      "huida_q6": [
+        "Cuando baje en ese ascensor hasta el piso -7.",
+        "Cuando La Gorga me mastique y me trague definitivamente.",
+        "Cuando logre mirarme al espejo del lavabo sin sentir asco de mí mismo.",
+        "Cuando encuentre a quien me hizo esto y le devuelva el favor.",
+        "Supongo que hoy. Por eso mis pasos me han traído hasta aquí.",
+        "En el fondo sé que nunca terminará. Es mi condena eterna.",
+        "Cuando la marea suba, entre en mis pulmones y me cubra por completo.",
+        "Cuando me pongan el traje negro y cierre los ojos.",
+        "Cuando logre entregar estas dos imágenes al director de mi tormenta.",
+        "Cuando el despertador de mi mesita de noche deje de parpadear.",
+        "Cuando la mancha amarilla de mi antebrazo se borre del todo.",
+        "Cuando el mar de la Costa Brava devuelva los huesos que se llevó.",
+        "Cuando se apague el último neón del hotel Excelsior.",
+        "Cuando logre cerrar la puerta de la antigua escuela de música.",
+        "Cuando el vagabundo del portal deje de mirarme fijamente.",
+        "Cuando acepte que mi casa ya no está en este mundo."
+      ],
+
+      // III. BÚSQUEDA
+      "busqueda_q1": [
+        "Esclarecer un secreto médico familiar que causó la muerte de mi madre.",
+        "Encontrar al artista plástico 'Andreu Pou' y preguntarle por qué me dibujó.",
+        "Busco a un niño que desapareció hace años en un centro comercial.",
+        "Busco la pureza del sonido. Un silencio que solo se encuentra bajo el agua.",
+        "La Verdad sobre lo que hay en las alcantarillas de esta ciudad.",
+        "Dar con el asesino de mi amante, que sé que se esconde entre estos vecinos.",
+        "Busco una película de los años 80 que creo que contiene mensajes sobre mi futuro.",
+        "Un objeto arqueológico, un pie de mármol por el que mataron a un hombre.",
+        "La herencia de mi abuela, una pequeña ermita apartada cerca del Pinar.",
+        "Un antiguo manuscrito que detalla la pintura amarilla del consistorio.",
+        "A un pescador que dice haber visto a mi hermano gemelo hace poco.",
+        "La razón por la que todos los maniquíes de l'Escuma tienen mi rostro.",
+        "Una vieja cinta de casete grabada con mi propia voz infantil.",
+        "El motivo del cierre repentino de la gran sala del hotel Excelsior.",
+        "Un llavero de latón que perdí en el antiguo tanatorio municipal.",
+        "La tumba sin nombre del cementerio al pie de la iglesia."
+      ],
+      "busqueda_q2": [
+        "Encontré un recorte de periódico de La Gorga en la chaqueta de mi difunto padre.",
+        "Un instinto irracional. El aire aquí huele a la sangre que estoy buscando.",
+        "Alguien usó mi tarjeta de crédito en los grandes almacenes l'Escuma.",
+        "Empezaré buscando en el Antiguo Tanatorio, la familia Vidal regentaba eso.",
+        "Recibí un mensaje anónimo con una coordenada GPS que apunta al faro.",
+        "Me dijeron que aquí vive gente que no envejece. Empezaré por la plaza del pueblo.",
+        "Las voces en las interferencias de la radio no paraban de repetir este nombre.",
+        "Buscaré en los registros del hotel Excelsior. Siempre hay respuestas en los hoteles.",
+        "Encontré una postal vieja de los años 60 entre los libros de mi madre.",
+        "Una vecina de mi antiguo orfanato me habló de las casas de la calle Fondanada.",
+        "He visto la silueta de esa ermita en mis sueños febriles de juventud.",
+        "El vagabundo de la plaza me dibujó el mapa del centro comercial l'Escuma.",
+        "Me llegó un mensaje al contestador con la dirección exacta del bar del faro.",
+        "Siento un ardor en el hígado cada vez que paso por delante del consistorio.",
+        "Un pescador de la Costa Brava me dio las indicaciones en una rampa de piedra.",
+        "Las golondrinas del portal chillaban este número de calle constantemente."
+      ],
+      "busqueda_q3": [
+        "Lo he perdido todo: mi matrimonio, mi casa y la custodia de mis hijos.",
+        "He sacrificado mi salud mental. Tengo temblores y no duermo sin pastillas.",
+        "Perdí la moralidad. He hecho cosas horribles a gente inocente para llegar aquí.",
+        "Mi juventud se ha evaporado persiguiendo fantasmas en archivos polvorientos.",
+        "Sacrifiqué mi fe. Yo era un hombre de Dios antes de ver lo que he visto.",
+        "Perdí un ojo en una pelea de bar preguntando donde no debía.",
+        "Mi capacidad para amar. Ya solo siento obsesión fría y calculadora.",
+        "He perdido el miedo a la muerte. Y eso es lo más peligroso que puedes perder.",
+        "He sacrificado mi propia identidad, ahora solo soy un alias en este expediente.",
+        "Perdí el último recuerdo feliz de mi abuela al vaciar su vieja casa.",
+        "Sacrifiqué mis ahorros para comprar este coche y venir de noche.",
+        "He perdido el respeto de mis antiguos socios en la gran ciudad.",
+        "Perdí la oportunidad de despedirme de mi hermana en el hospital.",
+        "Sacrifiqué mi tranquilidad familiar por un puñado de cartas sin matasellos.",
+        "He perdido el sentido de la tregua que creía tener con el pasado.",
+        "Sacrifiqué mi rostro original ante los cirujanos del centro hospitalario."
+      ],
+
+      // IV. DESPERTAR
+      "despertar_q1": [
+        "El ruido estridente del claxon de mi coche mientras me estampaba.",
+        "Miraba el fondo de pantalla de mi teléfono mientras me sumergía en la bañera.",
+        "Unas pastillas naranjas derramándose sobre una mesita de noche.",
+        "El flash de una cámara de fotos cegándome por completo.",
+        "La sonrisa antinatural de alguien a quien acababa de besar.",
+        "Una sala de fiestas, música a todo volumen y un golpe seco en la nuca.",
+        "Estaba a punto de abrir un regalo envuelto en papel de regalo.",
+        "El repiqueteo de la lluvia contra la persiana metálica de un almacén.",
+        "El zumbido de un tábano gordo revoloteando sobre mi rostro sudado.",
+        "El siseo de una cafetera cayendo dolorosamente contra el suelo marmóreo.",
+        "La luz fluorescente de los urinarios públicos parpadeando sin cesar.",
+        "El sabor agrio de la sopa de pescado en la inmensa sala del comedor.",
+        "Unas llaves magnéticas deslizándose dolorosamente por mi antebrazo.",
+        "La voz de mi hermana enérgica diciendo 'Es hora de que vuelvas'.",
+        "El frío asfixiante de una bolsa de plástico cerrándose sobre mi cuello.",
+        "La marea invernal de la playa arrastrándome hacia el fondo oscuro."
+      ],
+      "despertar_q2": [
+        "He visto su nombre en los telediarios alguna vez, siempre por sucesos macabros.",
+        "Mi abuela era curandera aquí. Siempre hablaba de la ciudad con terror.",
+        "Solo como un destino turístico decadente al que la gente va a emborracharse.",
+        "No la conocía, pero los edificios amarillos me resultan asquerosamente familiares.",
+        "Significa el lugar donde mi familia veraneaba antes del divorcio.",
+        "Tengo una foto antigua en el bolsillo que pone 'Recuerdo de La Gorga'.",
+        "Había leído sobre ella en un ensayo de arquitectura brutalista abandonada.",
+        "Pensaba que era una leyenda urbana, un pueblo inventado para asustar a los niños.",
+        "Para mí es el escenario de una película de terror de los años ochenta.",
+        "Es el pueblo donde nació mi primer novio, el del coche rojo.",
+        "Recuerdo haber leído que repartieron nueve mil litros de pintura blanca.",
+        "Para mí significa el silencio que rodeaba a mi madre en el hospital.",
+        "La asocio con el anuncio luminoso del hotel Excelsior que vi en la autopista.",
+        "Es el lugar donde mi tía se cayó por esas cuatro escaleras de la calle.",
+        "Un destino turístico de casitas blancas que amarillearon con el sol.",
+        "El estómago del leviatán que se alimenta de la gente rota."
+      ],
+      "despertar_q3": [
+        "No puedo recordar el rostro de mi hijo. Solo veo una mancha borrosa.",
+        "Me angustia no saber si fui yo quien apretó el gatillo o si fue un accidente.",
+        "No sé cómo me he hecho esta cicatriz que cruza mi antebrazo.",
+        "No recuerdo dónde he dejado el objeto más valioso que poseía.",
+        "Siento que he olvidado pedir perdón a alguien antes de venir aquí.",
+        "No puedo recordar si el cuerpo que vi en el maletero estaba respirando.",
+        "Me aterra no recordar por qué tengo las manos manchadas de tierra húmeda.",
+        "No consigo recordar mi propio apellido, por mucho que lo intente.",
+        "No logro recordar si la llamada telefónica era de mi hermana o de mi madre.",
+        "Me angustia no saber si el hombre de la plaza era real o un maniquí.",
+        "No recuerdo qué había dentro del paquete envuelto en papel de regalo.",
+        "Siento que olvidé apagar el aire acondicionado antes de salir de casa.",
+        "No puedo recordar de quién era el marcapasos ensangrentado del asfalto.",
+        "Me preocupa no recordar por qué mi maleta pesa tanto hoy.",
+        "No consigo recordar el color original de la fachada de mi tía.",
+        "Me aterra no saber si la gárgola de la entrada se estaba moviendo."
+      ],
+      "despertar_q4": [
+        "El sonido de una urraca picoteando la ventana de mi habitación.",
+        "El sabor metálico de una cuchilla de afeitar rozando mi lengua.",
+        "La imagen de un maniquí vestido con la misma ropa que llevo yo ahora.",
+        "Una discusión a gritos con mi hermana gemela en la que le deseé la muerte.",
+        "El olor a cloro penetrante de la piscina de un instituto.",
+        "La visión de unos pies colgados a dos metros del suelo a través de una persiana.",
+        "El tacto frío y viscoso de una pecera en la que todos los peces murieron.",
+        "La voz de un locutor de radio dando la noticia de mi propia muerte.",
+        "Una cajita de música con forma de carrusel girando en mitad del Pinar.",
+        "El olor agrio de la loción bronceadora sobre la piel quemada por el sol.",
+        "Unas botas de agua cubiertas de fango en el porche de la ermita.",
+        "Mi abuela para apartando suavemente las cortinas raídas con sus manos frías.",
+        "El repiqueteo rítmico de una uña contra la madera del confesionario.",
+        "Las golondrinas chillando enérgica y ruidosamente en el portal del edificio.",
+        "El brillo metálico de una cubertería de plata grabada con las iniciales A.P.",
+        "Mi reflejo deformado en los espejos limpios del vestíbulo norte."
+      ],
+
+      // V. REGRESO
+      "regreso_q1": [
+        "Tenía seis años. Mis padres huyeron en mitad de la noche sin llevarse nada.",
+        "A los catorce, cuando me enviaron al internado porque no soportaban mirarme.",
+        "Justo al cumplir los dieciocho, robé un coche y no miré atrás.",
+        "Dejé la ciudad cuando empecé la universidad, prometiendo no volver jamás.",
+        "Tenía veinticinco años y el corazón roto por una traición imperdonable.",
+        "Me fui de niño, tras el funeral a ataúd cerrado de mi mejor amigo.",
+        "Huí a los doce años, después de encontrar lo que escondían en el sótano.",
+        "Apenas era un bebé. Mi madre me entregó a unos forasteros en la estación.",
+        "Tenía quince años. Decidí subirme a un tren de solo ida con una maleta pequeña.",
+        "Me marché a los veinte, cansado de ver cómo la pintura blanca amarilleaba.",
+        "Dejé la ciudad tras el incendio misterioso del antiguo tanatorio municipal.",
+        "Tenía diez años. Mi padre vendió el barco de pesca y nos mudamos a la gran ciudad.",
+        "Huí a los diecisiete, con el rostro cubierto por una máscara de anciano.",
+        "Tenía ocho años cuando cerraron definitivamente la escuela de música.",
+        "Me fui con mi hermana gemela a una pensión barata en la Costa Brava.",
+        "Tenía treinta años cuando enterraron a mi abuela en el huertecito de casa."
+      ],
+      "regreso_q2": [
+        "He recibido en herencia la vieja casa familiar de la calle de la Fondanada.",
+        "Porque me han diagnosticado una enfermedad y quiero morir donde nací.",
+        "Para vengarme de los que me hicieron bullying en el instituto.",
+        "El sentimiento de nostalgia se volvió insoportable, como un picor constante.",
+        "Vengo a buscar el perdón de la única persona que dejé abandonada aquí.",
+        "He vuelto para desenterrar algo que escondí en el jardín del colegio.",
+        "Mi empresa me ha trasladado a esta sucursal. Yo no quería venir.",
+        "Porque cada vez que intentaba huir lejos, la carretera me traía de vuelta.",
+        "Me llegó una postal arrugada del hotel Excelsior con la caligrafía de mi tía.",
+        "Quiero saber si el secreto que me confió el barman de joven sigue siendo real.",
+        "He venido a buscar al artista plástico que dibujó mi retrato adolescente.",
+        "Vengo a cerrar de una vez por todas la puerta de la capilla de música.",
+        "Porque he encontrado una llave numerada en la chaqueta de mi difunto padre.",
+        "Quiero ver si el mar de La Ferèstega ha devuelto lo que perdí allí.",
+        "Me he cansado de fingir que todo va bien en mi sucursal de Valencia.",
+        "Vengo a presenciar el velatorio de mi tía en el antiguo tanatorio."
+      ],
+      "regreso_q3": [
+        "Mi tía anciana, que se negaba a abandonar la casa a pesar de las humedades.",
+        "Nadie humano. Solo los fantasmas de mi pasado, esperándome con los brazos abiertos.",
+        "El matón del barrio, que juró que me mataría si volvía a pisar estas calles.",
+        "Un amor de juventud que prometió esperarme en el faro cada viernes.",
+        "El cura de la iglesia, que siempre supo la verdad sobre mis pecados.",
+        "Mi hermana, que se quedó cuidando de nuestros padres enfermos.",
+        "Un acreedor al que le debo mucho dinero y que tiene muy buena memoria.",
+        "La propia ciudad de La Gorga. Siento que me estaba esperando.",
+        "Un perro viejo que perteneció a mi familia y que vaga por la plaza.",
+        "El dependiente de la gasolinera de las afueras, que sabe quién soy.",
+        "Una anciana con un cesto de castañas que siempre se sienta en el portal.",
+        "El conserje de l'Escuma, que tiene guardado un paquete para mí.",
+        "Un antiguo compañero de clase que ahora se viste como un vagabundo.",
+        "El loro calvo que mi tía tenía encadenado en la casa unifamiliar.",
+        "Alguien cuya voz a través de la mirilla invertida me resulta familiar.",
+        "La marea silenciosa de la playa, con un espacio guardado para mí."
+      ],
+      "regreso_q4": [
+        "El viejo cine donde me colaba de niño ha cerrado y es una ruina.",
+        "La alegría de la gente. Ahora todos caminan encorvados y no se miran a los ojos.",
+        "Mi inocencia. Vuelvo como un cínico incapaz de sentir empatía.",
+        "La casa de mis abuelos fue demolida para construir un hotel decadente.",
+        "La playa donde jugaba ahora está contaminada con una grasa amarilla y espesa.",
+        "La cordura de mi madre. Cuando fui a verla, no me reconoció y empezó a gritar.",
+        "Mis amigos de la infancia. Todos se han marchado, han muerto o están locos.",
+        "La blancura de las casas. Ese amarillo enfermizo lo ha devorado todo.",
+        "El huerto escolar donde los niños solían enterrar a sus mascotas muertas.",
+        "El piano de cola del departamento de Catalán, ahora desafinado por la humedad.",
+        "Los carteles motivadores del instituto, ahora cubiertos de moho negro.",
+        "La antigua cabina telefónica de la plaza, ahora atascada de arena seca.",
+        "El letrero luminoso del Excelsior, ahora apagado y con los cables rotos.",
+        "El olor a pan recién hecho de la panadería de la esquina del consistorio.",
+        "La pequeña ermita del cabo de Creus, ahora con las puertas desencajadas.",
+        "La pureza de mi recuerdo sobre el primer beso que di en el rompeolas."
+      ],
+      "regreso_q5": [
+        "Mi lugar favorito es el rompeolas; me da pánico el viejo ambulatorio.",
+        "Adoro los grandes almacenes l'Escuma; tiemblo al pasar por el callejón trasero del bar.",
+        "Me relaja el cementerio; me aterra la galería de arte del ayuntamiento.",
+        "Mi refugio era la biblioteca municipal; pero no soporto acercarme a los urinarios de la estación.",
+        "Amo la arena de la playa en invierno; me aterra el parking subterráneo del centro comercial.",
+        "Mi rincón es el campanario de la iglesia; le tengo fobia a la tienda de maniquíes.",
+        "Disfruto paseando por la feria abandonada; me asusta profundamente la consulta del dentista.",
+        "Mi favorito es la sala 8 del tanatorio; evito a toda costa el aula de música del instituto.",
+        "Me gusta el mirador del faro; me inquieta el solar fangoso donde aparcan los camiones.",
+        "Amo el olor a ozono del cabo de Creus; me aterra el pasillo insonorizado del cine.",
+        "Mi refugio es el huertecito de mi tía; pero evito pasar delante del consistorio amarillo.",
+        "Disfruto con la sintonía del noticiario de la tarde; me asusta el silencio de la ermita.",
+        "Me gusta la rampa del muelle de hormigón; tiemblo ante el ascensor del piso -7.",
+        "Mi rincón es el confesionario de la iglesia; le tengo fobia a los probadores de l'Escuma.",
+        "Amo el sabor del agua de la fuente; me aterra el cartel del Night Club de las afueras.",
+        "Disfruto ordenando los libros de la estantería; evito mirar a través de las mirillas invertidas."
+      ],
+      "regreso_q6": [
+        "Una pequeña caja de latón enterrada bajo una higuera enferma.",
+        "El remordimiento de no haber hecho nada cuando pude.",
+        "Un nicho vacío en el cementerio que lleva mi nombre grabado.",
+        "El título de propiedad de un solar lleno de escombros y barro.",
+        "La mitad de una fotografía rasgada. La otra mitad la tiene alguien más.",
+        "Un secreto que si saliera a la luz hundiría al alcalde del pueblo.",
+        "Una vieja bicicleta oxidada abandonada en el trastero del colegio.",
+        "Mi propio reflejo distorsionado en los escaparates de la calle principal.",
+        "Un despertador roto con forma de globo terráqueo en la mesita de noche.",
+        "La llave de una nevera industrial con una marca que no logro descifrar.",
+        "Un cepillo para el pelo de porcelana con mis iniciales grabadas en pan de oro.",
+        "Un llavero de latón oxidado que perteneció a mi abuela paterna.",
+        "La vaga sospecha de que yo fui el culpable de lo que pasó en el coche rojo.",
+        "Un boleto de tren de solo ida arrugado en mi cartera deprimida.",
+        "El remordimiento de haber dejado a mi hermana gemela sola en el internado.",
+        "Un dibujo infantil que hice a los nueve años titulado 'Papá, mi héroe'."
+      ],
+
+      // VI. PERTENENCIA
+      "pertenencia_q1": [
+        "Ambos parecemos amables por fuera, pero estamos podridos por dentro.",
+        "En ese tono amarillento y cansado que recubre mi piel y sus fachadas.",
+        "En que los dos atraemos a la gente rota para nutrirnos de su desgracia.",
+        "En el silencio. Soy tan hermético e inexpresivo como estas calles en invierno.",
+        "En que ninguno de los dos puede olvidar el pasado ni seguir adelante.",
+        "Tengo la misma frialdad que la marea invernal de la Costa Brava.",
+        "En que parezco un decorado de cartón piedra. Finjo ser normal, pero estoy hueco.",
+        "Los dos engullimos cualquier rastro de esperanza de quienes se nos acercan.",
+        "En el olor a amoníaco que intento usar para limpiar mis culpas familiares.",
+        "En la rigidez de nuestros rasgos, cansados de sostener la misma máscara.",
+        "En la herrumbre de nuestras articulaciones al ponernos en movimiento de mañana.",
+        "En que los dos guardamos un secreto inconfesable enterrado en el jardín.",
+        "Ambos estamos de temporada baja permanente, vacíos y sin luz artificial.",
+        "En el zumbido constante y molesto que no cesa de sonar en nuestras entrañas.",
+        "En que el agua de nuestros charcos nunca se evapora del todo, solo fango.",
+        "Los dos estamos heridos de muerte pero nos negamos a cerrar los ojos."
+      ],
+      "pertenencia_q2": [
+        "Vendería a mi propio hijo a los monstruos de esta ciudad con tal de salir.",
+        "Prendería fuego al centro comercial entero si con eso La Gorga me dejara ir.",
+        "Me cortaría un brazo si eso me garantizara un billete de tren sin retorno.",
+        "Mentiría a la policía para encubrir a la ciudad; soy su cómplice necesario.",
+        "Asesinaría a cualquier forastero si La Gorga me lo pidiera para calmar su hambre.",
+        "No haría nada para huir. He aceptado que soy un engranaje más de este estómago.",
+        "Para protegerla, enterraría en el fango a todo aquel que intente investigarnos.",
+        "Llegaría hasta las últimas consecuencias. Hasta dejar de ser humano.",
+        "Entregaría mis dos imágenes preferidas al director para que atormente a otros.",
+        "Destruiría la antigua escuela de música para que nadie recuerde mi infancia.",
+        "Firmaría una tregua eterna con los maniquíes del centro l'Escuma.",
+        "Inundaría el parking de la planta -7 para ocultar las pruebas del accidente.",
+        "Robaría las llaves del antiguo tanatorio para dárselas al enterrador.",
+        "Vendería mis secretos familiares al alcalde a cambio de una pensión barata.",
+        "Desconectaría el faro de noche para que más barcos se estrellen en la costa.",
+        "Aceptaría que mi reflejo en el espejo del Excelsior ya no me pertenece."
+      ],
+      "pertenencia_q3": [
+        "Me ha robado la ambición; ahora mi mayor placer es ver pudrirse a los turistas.",
+        "Arruinó mi juventud aislándome, pero me iluminó mostrándome la hipocresía del mundo.",
+        "Gozó viendo cómo los que intentan escapar siempre fracasan estrepitosamente.",
+        "Destruyó mi matrimonio, pero a cambio me dio el gozo inalcanzable de la resignación total.",
+        "Me quitó la empatía; ahora disfruto el dolor ajeno como si fuera una obra de teatro.",
+        "Secó mi corazón. Mi único consuelo es el olor a salitre mezclado con amoníaco.",
+        "Me arruinó físicamente, pero me enseñó a disfrutar del silencio sepulcral de la medianoche.",
+        "Ha convertido mi vida en una rutina vacía, iluminada solo por el morbo de las autopsias.",
+        "Me quitó el derecho de ser visto, convirtiéndome en un observador de la boira.",
+        "Me robó el primer beso en el rompeolas, pero me dio un silencio cómodo de noche.",
+        "Arruinó mi carrera en Valencia, pero me dio un rincón en la calle Fondanada.",
+        "Me quitó a mi hermano gemelo, pero a cambio me devolvió su foto rota.",
+        "Destruyó mi fe en el creador, mostrándome que la Providencia es solo un estómago.",
+        "Secó mi memoria de niño, iluminándola solo con destellos de un coche rojo.",
+        "Me quitó el orgullo de vestir bien, convirtiéndome en una marioneta de asfalto.",
+        "Ha arruinado mi cordura, enseñándome el gozo de ver llover dentro del dormitorio."
+      ],
+      "pertenencia_q4": [
+        "Sé que la pintura blanca del 74 no amarilleó por el sol, sino por lo que enterraron en los cimientos.",
+        "Sé que los maniquíes de los grandes almacenes l'Escuma no siempre fueron de plástico.",
+        "Conozco el motivo real por el que el ascensor del hotel Excelsior no tiene botón del séptimo piso.",
+        "Sé qué especie de carne venden realmente en la carnicería Martí los jueves.",
+        "Descubrí que la lluvia que a veces cae de lado en otoño es, en realidad, los jugos gástricos de la ciudad.",
+        "Conozco el pacto que firmó el párroco para que los niños dejaran de desaparecer en los ochenta.",
+        "Sé que en La Gorga no hay gaviotas reales; las que vuelan son otra cosa.",
+        "Descubrí que el faro no sirve para avisar a los barcos, sino para atraerlos hacia las rocas.",
+        "Sé quién dejó el marcapasos ensangrentado en la rampa de piedra de la playa.",
+        "Conozco la fórmula de las pastillas que la curandera sacaba del cuerpo del niño.",
+        "Sé de quién es la nuca que se ve en el asiento de atrás del coche rojo.",
+        "Descubrí que la mirilla del departamento de Catalán está realmente invertida.",
+        "Sé qué hay debajo de los montones de tierra húmeda del cementerio de mascotas.",
+        "Conozco al verdadero destinatario de las postales de los sesenta del Hostal del Mar.",
+        "Sé por qué el despertador del vestíbulo norte parpadea siempre a las tres.",
+        "Descubrí por qué las golondrinas del portal tiran siempre a sus polluelos."
+      ]
     };
 
+    // Estructura de las Misiones/Preguntas
     const questionsStructure = {
       llamada: [
         { id: "llamada_q1", label: "✦ ¿De quién se trata? ¿Familiar, amigo o amiga, amante…?" },
@@ -470,6 +968,7 @@
       ]
     };
 
+    // Sentencias Aleatorias de La Gorga para el pie de página de exportación
     const frasesAforismos = [
       "Nadie escapa a su propio esófago.",
       "La ciudad amarilla lo cura todo.",
@@ -487,6 +986,7 @@
 
     let activeTabId = 'llamada'; 
 
+    // Inicializar Formulario Dinámico
     function renderFields() {
       Object.keys(questionsStructure).forEach(tab => {
         const container = document.getElementById(`fields-${tab}`);
@@ -499,7 +999,7 @@
                 <label class="block text-[11px] text-zinc-400 typewriter uppercase leading-tight pr-4">${q.label}</label>
                 <button onclick="fillRandom('${q.id}')" class="susurrar-btn text-zinc-500 hover:text-yellow-500 flex items-center gap-1 text-[9px] typewriter transition-colors shrink-0" title="Susurrar idea">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                  AZAR
+                  SUSURRAR
                 </button>
               </div>
               <textarea id="${q.id}" class="w-full bg-[#050505] border border-zinc-800 focus:border-yellow-700 rounded-sm p-3 text-sm text-zinc-300 outline-none typewriter min-h-[70px] resize-y transition-colors placeholder-zinc-700" placeholder="..."></textarea>
@@ -510,6 +1010,7 @@
       });
     }
 
+    // Lógica para cambiar Tabs
     function switchTab(tabId) {
       activeTabId = tabId;
       document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
@@ -520,31 +1021,40 @@
       }
 
       document.querySelectorAll('#nav-tabs button').forEach(b => {
-        b.classList.remove('bg-yellow-900/20', 'text-yellow-500', 'border-yellow-700/50');
-        b.classList.add('border-zinc-800', 'bg-[#0a0a0a]', 'text-zinc-400');
+        b.classList.remove('border-yellow-600', 'bg-yellow-900/10', 'text-yellow-500');
+        b.classList.add('border-zinc-800', 'text-zinc-400');
       });
 
       const activeBtn = document.getElementById('btn-' + tabId);
       if (activeBtn) {
-        activeBtn.classList.remove('border-zinc-800', 'bg-[#0a0a0a]', 'text-zinc-400');
-        activeBtn.classList.add('bg-yellow-900/20', 'text-yellow-500', 'border-yellow-700/50');
+        activeBtn.classList.add('border-yellow-600', 'bg-yellow-900/10', 'text-yellow-500');
+        activeBtn.classList.remove('border-zinc-800', 'text-zinc-400');
       }
     }
 
+    // Lógica de Randomización con protección
     function fillRandom(fieldId) {
       const options = loreDB[fieldId];
-      if (!options || options.length === 0) return;
+      if (!options) return;
       const element = document.getElementById(fieldId);
       if (!element) return;
       
       const randomText = options[Math.floor(Math.random() * options.length)];
       element.value = randomText;
       
+      // Intentar actualizar también la vista previa si corresponde
       if (fieldId === 'meta-nombre') {
         const out = document.getElementById('output-nombre');
         if (out) out.textContent = randomText;
+      } else if (fieldId === 'meta-lugar') {
+        const out = document.getElementById('output-lugar');
+        if (out) out.textContent = randomText;
+      } else if (fieldId === 'meta-objeto') {
+        const out = document.getElementById('output-objeto');
+        if (out) out.textContent = randomText;
       }
       
+      // Feedback visual ligero
       element.style.borderColor = '#ca8a04';
       element.style.backgroundColor = '#1a1a0f';
       setTimeout(() => {
@@ -553,6 +1063,7 @@
       }, 300);
     }
 
+    // Toasts de Notificación
     function showToast(msg) {
       const toast = document.getElementById('toast');
       if (toast) {
@@ -563,8 +1074,14 @@
       }
     }
 
+    // Espejar datos de la barra lateral de manera 100% segura contra elementos ausentes
     const metaNombre = document.getElementById('meta-nombre');
+    const metaLugar = document.getElementById('meta-lugar');
+    const metaObjeto = document.getElementById('meta-objeto');
+
     const outputNombre = document.getElementById('output-nombre');
+    const outputLugar = document.getElementById('output-lugar');
+    const outputObjeto = document.getElementById('output-objeto');
 
     if (metaNombre) {
       metaNombre.addEventListener('input', (e) => {
@@ -574,28 +1091,47 @@
       });
     }
 
+    if (metaLugar) {
+      metaLugar.addEventListener('input', (e) => {
+        if (outputLugar) {
+          outputLugar.textContent = e.target.value.trim() || "Ninguna";
+        }
+      });
+    }
+
+    if (metaObjeto) {
+      metaObjeto.addEventListener('input', (e) => {
+        if (outputObjeto) {
+          outputObjeto.textContent = e.target.value.trim() || "Sin declarar";
+        }
+      });
+    }
+
+    // Exportación a PNG COMPACTO (Formato Vertical)
     function exportToCompactPNG() {
       showToast("Revelando el expediente...");
       
-      // Recoger los datos básicos y los nuevos campos (Postal e Imagen)
       const elNombre = metaNombre ? (metaNombre.value.trim() || 'Desconocido') : 'Desconocido';
-      const elLugar = document.getElementById('meta-lugar') ? document.getElementById('meta-lugar').value.trim() : '';
-      const elObjeto = document.getElementById('meta-objeto') ? document.getElementById('meta-objeto').value.trim() : '';
+      const elLugar = metaLugar ? (metaLugar.value.trim() || 'Sin definir') : 'Sin definir';
+      const elObjeto = metaObjeto ? (metaObjeto.value.trim() || 'Sin definir') : 'Sin definir';
       
+      // Rellenar cabeceras compactas si existen
       const expNombre = document.getElementById('export-nombre');
+      const expLugar = document.getElementById('export-lugar');
+      const expObjeto = document.getElementById('export-objeto');
       const expOrigen = document.getElementById('export-origen');
       const expFrase = document.getElementById('export-frase-azar');
-      const expPostal = document.getElementById('export-postal');
-      const expImagen = document.getElementById('export-imagen');
 
       if (expNombre) expNombre.textContent = elNombre;
+      if (expLugar) expLugar.textContent = elLugar;
+      if (expObjeto) expObjeto.textContent = elObjeto;
       if (expOrigen) expOrigen.textContent = "Origen: " + activeTabId.toUpperCase();
-      if (expPostal) expPostal.textContent = elLugar || 'Ninguna postal declarada.';
-      if (expImagen) expImagen.textContent = elObjeto || 'Ninguna imagen declarada.';
 
+      // Seleccionar una frase de ambiente al azar para este guardado específico
       const fraseAzar = frasesAforismos[Math.floor(Math.random() * frasesAforismos.length)];
       if (expFrase) expFrase.textContent = `"${fraseAzar}"`;
 
+      // Construir QA dinámico
       const qaContainer = document.getElementById('export-qa-container');
       if (qaContainer) {
         qaContainer.innerHTML = '';
@@ -613,7 +1149,7 @@
         });
 
         if (qaContainer.innerHTML === '') {
-           qaContainer.innerHTML = `<p class="text-xs text-zinc-650 italic" style="color: #52525b;">Expediente vacío. El sujeto no ha declarado sobre su origen.</p>`;
+           qaContainer.innerHTML = `<p class="text-xs text-zinc-650 italic">Expediente vacío. El sujeto no ha declarado.</p>`;
         }
       }
 
@@ -623,6 +1159,7 @@
         return;
       }
       
+      // Verificación y ejecución segura de html2canvas
       if (typeof html2canvas === 'undefined') {
         showToast("Error: La librería de imagen no cargó. Comprueba tu conexión.", "❌");
         return;
@@ -632,7 +1169,6 @@
         html2canvas(card, {
           backgroundColor: '#0d0d0c',
           scale: 2,
-          useCORS: true,
           logging: false
         }).then(canvas => {
           const link = document.createElement('a');
@@ -650,6 +1186,7 @@
       }
     }
 
+    // Inicialización del sistema
     renderFields();
   </script>
 </body>
